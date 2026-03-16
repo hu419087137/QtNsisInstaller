@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>InstallerWizard</class>
+ <widget class="QDialog" name="InstallerWizard">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>682</width>
+    <height>536</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MyQtApplication Setup</string>
+  </property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>20</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="installerContainer">
+     <property name="styleSheet">
+      <string notr="true">QFrame#installerContainer {
+    background: white;
+    border-radius: 8px;
+}
+CustomTitleBar QLabel {
+    color: #333;
+    font-size: 11pt;
+    font-weight: 500;
+}
+CustomTitleBar QPushButton {
+    background: transparent;
+    color: #666;
+    border: none;
+    font-size: 18pt;
+    padding-bottom: 6px;
+}
+CustomTitleBar QPushButton:hover {
+    background: #e5e5e5;
+}
+CustomTitleBar QPushButton#closeBtn {
+    font-size: 20pt;
+    padding-bottom: 4px;
+}
+CustomTitleBar QPushButton#closeBtn:hover {
+    background: #e81123;
+    color: white;
+}
+QStackedWidget {
+    background: white;
+}
+QLabel {
+    color: #333;
+}
+QLineEdit {
+    background: white;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px;
+}
+QTextBrowser {
+    background: white;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+QProgressBar {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    text-align: center;
+    background: #f0f0f0;
+    color: #333;
+}
+QProgressBar::chunk {
+    background: #0078d4;
+    border-radius: 3px;
+}
+QCheckBox {
+    color: #333;
+}
+QPushButton {
+    background: #0078d4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 16px;
+}
+QPushButton:hover {
+    background: #1084d8;
+}
+QPushButton:disabled {
+    background: #ccc;
+    color: #888;
+}
+QPushButton#backBtn, QPushButton#cancelBtn {
+    background: #f0f0f0;
+    color: #333;
+    border: 1px solid #d0d0d0;
+}
+QPushButton#backBtn:hover, QPushButton#cancelBtn:hover {
+    background: #e0e0e0;
+}
+QPushButton#backBtn:disabled {
+    background: #f8f8f8;
+    color: #aaaaaa;
+    border: 1px solid #e5e5e5;
+}
+QFrame#navBar {
+    background: white;
+    border-top: 1px solid #e5e5e5;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
+     </property>
+     <layout class="QVBoxLayout" name="containerLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="CustomTitleBar" name="titleBar" native="true"/>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="pageStack">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="navBar">
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+        <layout class="QHBoxLayout" name="navLayout">
+         <property name="leftMargin">
+          <number>16</number>
+         </property>
+         <property name="topMargin">
+          <number>10</number>
+         </property>
+         <property name="rightMargin">
+          <number>16</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="backBtn">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>&lt; Back</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="navSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="nextBtn">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Next &gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="cancelBtn">
+           <property name="minimumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>100</width>
+             <height>32</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Cancel</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomTitleBar</class>
+   <extends>QWidget</extends>
+   <header>InstallerWizard.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

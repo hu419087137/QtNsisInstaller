@@ -1,0 +1,24 @@
+如果您遵守这些许可条款，您将拥有以下永久权利。
+
+安装和使用:
+	本软件的一切知识产权均为本公司所有，用户可以非商业性无限制数量安装及使用本软件
+
+数据收集：
+	为了更好地为您提供服务，我们将会收集设备的时区及位置信息，以便协助您进行时区设置及提供后续的运维服务。我们将会采用合理的措施使用和保管收集的信息，且不会将其提供给任何第三方。
+
+Data Collection:
+	To enhance your service experience, we may collect your device’s time zone and location data to assist with time zone configuration and to support ongoing maintenance and operations services. We will implement reasonable measures to protect and use the collected information, which will not be disclosed to third parties.
+
+许可范围：
+	用户可以非商业性无限制复制、分发和传播本软件产品，但必须保证每一份复制、分发和传播都是完整和真实的，包括所有有关本软件产品的软件
+电子文档，版权和商标，亦包括本协议。
+
+权利限制：
+	禁止反向工程、反向编译和反向汇编。除法律法规名明文规定允许上述活动外，用户必须遵守此协议限制。
+
+保留权利：
+	本协议未明示授权的其他一切权利仍归本公司所有，用户使用其他权力时必须获得本公司的书面同意。
+
+上海仙工智能科技有限公司保留最终解释权
+Copyright 2026 Seer Group. Corporation
+www.seer-group.com
