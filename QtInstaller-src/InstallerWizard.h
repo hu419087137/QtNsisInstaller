@@ -81,6 +81,7 @@ public:
                              QWidget *parent = nullptr);
     ~InstallerWizard();
 
+    QString whiteStyleSheet() const;
 protected:
     void showEvent(QShowEvent *event) override;
     void paintEvent(QPaintEvent *e) override;
@@ -132,6 +133,9 @@ class WelcomePage : public QWizardPage
 public:
     explicit WelcomePage(QWidget *parent = nullptr);
     ~WelcomePage();
+
+    /** Sets the application name displayed in the banner and intro text. */
+    void setAppName(const QString &appName);
 
 private:
     Ui::WelcomePage *ui;
@@ -229,6 +233,9 @@ public:
     ~InstallProgressPage();
 
     bool isComplete() const override;
+
+    /** Sets the application name displayed in the progress banner. */
+    void setAppName(const QString &appName);
 
     /** Start extraction of @p archivePath into @p destPath using 7za.exe. */
     void startExtraction(const QString &archivePath, const QString &destPath);

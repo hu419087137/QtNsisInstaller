@@ -43,6 +43,7 @@ constexpr int kShadowOffsetY = 4;
 
 bool detectWindowsDarkMode()
 {
+    return false;
 #ifdef Q_OS_WIN
     QSettings settings(
         "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
@@ -196,7 +197,7 @@ void InstallerWizard::setupWindow()
                    kWizardMinHeight + 2 * kShadowMargin + kShadowOffsetY);
     setAttribute(Qt::WA_TranslucentBackground, true);
     ui->setupUi(this);
-    ui->titleBar->setTitle("MyQtApplication Setup");
+    ui->titleBar->setTitle(tr("%1 Setup").arg(_appName));
 
     connect(ui->titleBar,  &CustomTitleBar::sigCloseClicked,    this, &InstallerWizard::reject);
     connect(ui->titleBar,  &CustomTitleBar::sigMinimizeClicked, this, &InstallerWizard::showMinimized);
@@ -206,10 +207,12 @@ void InstallerWizard::setupWindow()
 
     // Create pages and add to the stack (QStackedWidget takes ownership)
     _welcomePage    = new WelcomePage;
+    _welcomePage->setAppName(_appName);
     _licensePage    = new LicensePage(_licenseFile);
     _pathPage       = new InstallPathPage(_appName);
     _componentsPage = new ComponentsPage;
     _progressPage   = new InstallProgressPage;
+    _progressPage->setAppName(_appName);
 
     ui->pageStack->addWidget(_welcomePage);
     ui->pageStack->addWidget(_licensePage);
@@ -287,13 +290,13 @@ void InstallerWizard::updateNavigation()
     ui->cancelBtn->setVisible(!isProgressPage);
 
     if (isProgressPage) {
-        ui->nextBtn->setText("Finish");
+        ui->nextBtn->setText(tr("Finish"));
         QWizardPage *page = qobject_cast<QWizardPage *>(ui->pageStack->currentWidget());
         ui->nextBtn->setEnabled(page != nullptr && page->isComplete());
     } else {
         ui->backBtn->setEnabled(_currentPage > 0);
         const bool isInstallPage = (_currentPage == kPageComponents);
-        ui->nextBtn->setText(isInstallPage ? "Install" : "Next >");
+        ui->nextBtn->setText(isInstallPage ? tr("Install") : tr("Next >"));
         QWizardPage *page = qobject_cast<QWizardPage *>(ui->pageStack->currentWidget());
         ui->nextBtn->setEnabled(page == nullptr || page->isComplete());
     }
@@ -303,6 +306,8 @@ void InstallerWizard::applyTheme()
 {
     if (_isDarkMode)
         ui->installerContainer->setStyleSheet(darkStyleSheet());
+    // else
+    //     ui->installerContainer->setStyleSheet(whiteStyleSheet());
 }
 
 QString InstallerWizard::darkStyleSheet() const
@@ -404,6 +409,30 @@ QFrame#navBar {
 }
     )";
 }
+QString InstallerWizard::whiteStyleSheet() const
+{
+    return R"(
+CustomTitleBar QPushButton {
+    background: transparent;
+    color: #aaaaaa;
+    border: none;
+    font-size: 18pt;
+    padding-bottom: 6px;
+}
+CustomTitleBar QPushButton:hover {
+    background: rgba(255, 255, 255, 25);
+    color: #e0e0e0;
+}
+CustomTitleBar QPushButton#closeBtn {
+    font-size: 20pt;
+    padding-bottom: 4px;
+}
+CustomTitleBar QPushButton#closeBtn:hover {
+    background: #e81123;
+    color: white;
+}
+)";
+}
 
 void InstallerWizard::saveConfig()
 {
@@ -418,6 +447,16 @@ void InstallerWizard::saveConfig()
     ini.setValue("CreateStartMenu",       _componentsPage->startMenuShortcut() ? 1 : 0);
     ini.endGroup();
     ini.sync();
+
+#ifdef Q_OS_WIN
+    // Pre-write install path to registry so next run reads it back correctly
+    // even when invoked standalone (without NSIS writing it post-install).
+    if (!_appName.isEmpty()) {
+        QSettings reg(QString("HKEY_CURRENT_USER\\Software\\%1").arg(_appName),
+                      QSettings::NativeFormat);
+        reg.setValue("InstallDir", _pathPage->installPath());
+    }
+#endif
 }
 
 // ===========================================================================
@@ -436,6 +475,11 @@ WelcomePage::WelcomePage(QWidget *parent)
 WelcomePage::~WelcomePage()
 {
     delete ui;
+}
+
+void WelcomePage::setAppName(const QString &appName)
+{
+    ui->titleLabel->setText(tr("Welcome to %1 Setup").arg(appName));
 }
 
 // ===========================================================================
@@ -458,7 +502,7 @@ LicensePage::LicensePage(const QString &licenseFile, QWidget *parent)
             ui->licenseText->setPlainText(text);
         } else {
             ui->licenseText->setPlainText(
-                QString("(无法打开协议文件: %1)").arg(licenseFile));
+                tr("(Cannot open license file: %1)").arg(licenseFile));
         }
     }
 
@@ -534,7 +578,7 @@ bool InstallPathPage::isComplete() const
 void InstallPathPage::slotBrowsePath()
 {
     const QString dir = QFileDialog::getExistingDirectory(
-        this, "Select Installation Directory", ui->pathEdit->text());
+        this, tr("Select Installation Directory"), ui->pathEdit->text());
     if (!dir.isEmpty())
         ui->pathEdit->setText(QDir::toNativeSeparators(dir));
 }
@@ -554,7 +598,7 @@ void InstallPathPage::updateDiskSpaceLabel(const QString &path)
 
     const QStorageInfo info(dir.absolutePath());
     if (!info.isValid() || !info.isReady()) {
-        ui->diskSpaceLabel->setText("无法获取磁盘信息");
+        ui->diskSpaceLabel->setText(tr("Unable to retrieve disk information"));
         ui->diskSpaceLabel->setStyleSheet("color: #888888; font-size: 9pt;");
         return;
     }
@@ -562,7 +606,7 @@ void InstallPathPage::updateDiskSpaceLabel(const QString &path)
     const qint64 avail = info.bytesAvailable();
     const QString rootNative = QDir::toNativeSeparators(info.rootPath());
     ui->diskSpaceLabel->setText(
-        QString("%1 可用空间: %2").arg(rootNative, formatBytes(avail)));
+        tr("%1 Available: %2").arg(rootNative, formatBytes(avail)));
 
     // Color-code by available space
     const char *color;
@@ -624,6 +668,11 @@ InstallProgressPage::~InstallProgressPage()
     delete ui;
 }
 
+void InstallProgressPage::setAppName(const QString &appName)
+{
+    ui->bannerTitleLabel->setText(tr("Installing %1").arg(appName));
+}
+
 bool InstallProgressPage::isComplete() const
 {
     return _done && _success;
@@ -633,7 +682,7 @@ void InstallProgressPage::startExtraction(const QString &archivePath, const QStr
 {
     // If no archive specified (e.g. standalone test), complete immediately
     if (archivePath.isEmpty()) {
-        ui->statusLabel->setText("No archive specified — skipping extraction.");
+        ui->statusLabel->setText(tr("No archive specified — skipping extraction."));
         ui->progressBar->setValue(100);
         _done    = true;
         _success = true;
@@ -641,7 +690,7 @@ void InstallProgressPage::startExtraction(const QString &archivePath, const QStr
         return;
     }
 
-    ui->statusLabel->setText("Starting extraction...");
+    ui->statusLabel->setText(tr("Starting extraction..."));
     ui->progressBar->setValue(0);
     ui->currentFileLabel->setText("");
 
@@ -662,11 +711,11 @@ void InstallProgressPage::startExtraction(const QString &archivePath, const QStr
     // -o    : output directory (no space between -o and path)
     const QString outArg = QString("-o") + QDir::toNativeSeparators(destPath);
     _process->start(sevenZa, {
-        "x", archivePath, outArg, "-y", "-bsp1"
-    });
+                                 "x", archivePath, outArg, "-y", "-bsp1"
+                             });
 
     if (!_process->waitForStarted(5000)) {
-        ui->statusLabel->setText("Error: could not start 7za.exe");
+        ui->statusLabel->setText(tr("Error: could not start 7za.exe"));
         _done    = true;
         _success = false;
         emit completeChanged();
@@ -688,7 +737,7 @@ void InstallProgressPage::slotReadOutput()
 
     if (lastPercent >= 0 && lastPercent <= 100) {
         ui->progressBar->setValue(lastPercent);
-        ui->statusLabel->setText(QString("Extracting... %1%").arg(lastPercent));
+        ui->statusLabel->setText(tr("Extracting... %1%").arg(lastPercent));
     }
 
     // Show the most recently extracted filename (7-zip logs "- filename" per file)
@@ -715,12 +764,12 @@ void InstallProgressPage::slotProcessFinished(int exitCode, QProcess::ExitStatus
     if (exitCode == 0 && status == QProcess::NormalExit) {
         _success = true;
         ui->progressBar->setValue(100);
-        ui->statusLabel->setText("Installation complete!");
+        ui->statusLabel->setText(tr("Installation complete!"));
         ui->currentFileLabel->setText("");
     } else {
         _success = false;
         ui->statusLabel->setText(
-            QString("Extraction failed (exit code %1). Check that 7za.exe is present.")
+            tr("Extraction failed (exit code %1). Check that 7za.exe is present.")
                 .arg(exitCode));
     }
     emit completeChanged();
@@ -762,7 +811,7 @@ void FinishDialog::setupFramelessWindow()
     ui->setupUi(container);
     ui->banner->setAttribute(Qt::WA_StyledBackground);
 
-    ui->titleBar->setTitle("Installation Complete");
+    ui->titleBar->setTitle(tr("Installation Complete"));
     connect(ui->titleBar,  &CustomTitleBar::sigCloseClicked, this, &FinishDialog::accept);
     connect(ui->finishBtn, &QPushButton::clicked,            this, &FinishDialog::slotRunAppClicked);
 

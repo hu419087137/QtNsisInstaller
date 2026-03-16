@@ -10,7 +10,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 # Find Qt6 packages
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Svg LinguistTools)
 
 # Source files
 set(SOURCES
@@ -44,6 +44,25 @@ target_link_libraries(QtInstaller PRIVATE
     Qt6::Gui
     Qt6::Widgets
     Qt6::Svg
+)
+
+# ---------------------------------------------------------------------------
+# Translations
+# ---------------------------------------------------------------------------
+set(TS_FILES "${CMAKE_CURRENT_SOURCE_DIR}/i18n/qtinstaller_zh_CN.ts")
+
+# Update TS files from source (creates update_translations target)
+qt_add_lupdate(QtInstaller TS_FILES ${TS_FILES})
+
+# Compile TS → QM and embed as resources under :/i18n/
+qt_add_lrelease(QtInstaller
+    TS_FILES ${TS_FILES}
+    QM_FILES_OUTPUT_VARIABLE QM_FILES
+)
+qt_add_resources(QtInstaller "translations"
+    PREFIX "/i18n"
+    BASE "${CMAKE_CURRENT_BINARY_DIR}"
+    FILES ${QM_FILES}
 )
 
 # Windows-specific settings
